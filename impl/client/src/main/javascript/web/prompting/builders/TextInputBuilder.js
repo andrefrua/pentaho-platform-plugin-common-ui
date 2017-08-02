@@ -49,9 +49,10 @@
  * @class
  * @extends FormattedParameterWidgetBuilderBase
  */
-define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent', './FormattedParameterWidgetBuilderBase', 'common-ui/jquery-clean'],
-  function (Util, DojoNumber, TextInputComponent, FormattedParameterWidgetBuilderBase, $) {
-
+define(["common-ui/util/util", "dojo/number", "cdf/components/TextInputComponent", "./FormattedParameterWidgetBuilderBase", "common-ui/jquery-clean", "common-ui/underscore"],
+  function(Util, DojoNumber, TextInputComponent, FormattedParameterWidgetBuilderBase, $, _) {
+    var testing = false;
+    var currentDashboard;
     return FormattedParameterWidgetBuilderBase.extend({
       /**
        * Builds the widget and returns a TextInputComponent
@@ -63,62 +64,86 @@ define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent
        * @param {Parameter} args.param - The Parameter instance
        * @returns {TextInputComponent} The TextInputComponent built
        */
-      build: function (args) {
-        function parseNumber(val){
-          try{
-            return DojoNumber.parse(val, { locale : Util.normalizeDojoLocale(SESSION_LOCALE) });
+      build: function(args) {
+        function parseNumber(val) {
+          try {
+            return DojoNumber.parse(val, {locale: Util.normalizeDojoLocale(SESSION_LOCALE)});
           } catch(e) {
-            return DojoNumber.parse(val, { locale : "en" });
+            return DojoNumber.parse(val, {locale: "en"});
           }
         }
-        function formatNumber(val){
-          try{
-            return DojoNumber.format(val, { locale : Util.normalizeDojoLocale(SESSION_LOCALE) });
+        function formatNumber(val) {
+          try {
+            return DojoNumber.format(val, {locale: Util.normalizeDojoLocale(SESSION_LOCALE)});
           } catch(e) {
-            return DojoNumber.format(val, { locale : "en" });
+            return DojoNumber.format(val, {locale: "en"});
           }
         }
+
         var widget = this.base(args);
         var name = widget.name + "-input";
         $.extend(widget, {
           name: name,
-          type: 'TextInputComponent',
-          preChange: function(){
-            var val = $("#"+this.name).attr('value');
+          type: "TextInputComponent",
+          preChange: function() {
+            var val = $("#" + this.name).val();
+
+            // TODO: Retrieve the type of valivadtion and message from parameters and also the error vlass to be applied
+            if(isNaN(val)) {
+              args.promptPanel.paramDefn.inlineValidations = JSON.parse('{"' + this.param.name + '":["This prompt value is of an invalid value"]}');
+              $("#" + this.name).addClass("invalid-value");
+            }
+
+            currentDashboard = this.dashboard;
             this.dashboard.setParameter(this.parameter, parseNumber(val));
           },
-          postExecution: function(){
+          postExecution: function() {
             this.base();
-
+            // debugger;
             var initialValue;
             $.each(this.param.values, function(i, v) {
-              if (v.selected) {
+              if(v.selected) {
                 initialValue = this.formatter ? this.formatter.format(this.transportFormatter.parse(v.value)) : v.value;
 
                 try {
-                  if (isNaN(v.value) || Math.abs(v.value) == Infinity) {
+                  if(isNaN(v.value) || Math.abs(v.value) == Infinity) {
                     var valueParsed = null;
                   } else {
-                    if (Util.isNumberType(v.type)) {
+                    if(Util.isNumberType(v.type)) {
                       valueParsed = formatNumber(v.value);
                     } else {
                       valueParsed = v.value;
                     }
                   }
-                } catch (e) {
+                } catch(e) {
                   valueParsed = v.value;
                 }
 
-                if (valueParsed != null) {
+                if(valueParsed != null) {
                   initialValue = v.label = v.value = valueParsed;
                 }
               }
             }.bind(this));
 
-            $("#"+this.name).attr('value', initialValue);
-          }
+            $("#" + this.name).attr("value", initialValue);
+          },
+          refreshOnKeyUp: args.param.attributes.refreshOnKeyUp
         });
+
+        var currentComponent;
+        if(currentDashboard) {
+          currentComponent = _.select(currentDashboard.components, function(component) {
+            // debugger;
+            return component.parameter === widget.parameter && component.type !== "ParameterPanelComponent";
+          });
+        }
+
+        // If component already exists then the same is returned
+        if(currentComponent) {
+          return currentComponent[0];
+        }
         return new TextInputComponent(widget);
+
       }
     });
   });
