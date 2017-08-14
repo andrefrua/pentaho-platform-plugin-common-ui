@@ -15,10 +15,10 @@
  *
  */
 
-define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
-  'common-ui/prompting/parameters/ParameterDefinition', 'common-ui/prompting/parameters/ParameterGroup',
-  'common-ui/prompting/parameters/Parameter', 'common-ui/prompting/parameters/ParameterValue', 'common-ui/jquery-clean', 'common-ui/underscore' ], function(DojoNumber,
-  i18n, PromptPanel, ParameterDefinition, ParameterGroup, Parameter, ParameterValue, $, _) {
+define(["dojo/number", "dojo/i18n", "common-ui/prompting/PromptPanel",
+  "common-ui/prompting/parameters/ParameterDefinition", "common-ui/prompting/parameters/ParameterGroup",
+  "common-ui/prompting/parameters/Parameter", "common-ui/prompting/parameters/ParameterValue", "common-ui/jquery-clean", "common-ui/underscore"], function(DojoNumber,
+    i18n, PromptPanel, ParameterDefinition, ParameterGroup, Parameter, ParameterValue, $, _) {
 
   describe("PromptPanel", function() {
 
@@ -28,11 +28,11 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         var fn = function() {
           new PromptPanel();
         };
-        expect(fn).toThrowError('destinationId is required');
+        expect(fn).toThrowError("destinationId is required");
       });
 
       it("should create prompt panel", function() {
-        var paramDefn = jasmine.createSpyObj("paramDefn", [ "allowAutoSubmit" ]);
+        var paramDefn = jasmine.createSpyObj("paramDefn", ["allowAutoSubmit"]);
         paramDefn.allowAutoSubmit.and.returnValue(true);
         var panel = new PromptPanel(testId, paramDefn);
         expect(panel.destinationId).toBe(testId);
@@ -44,10 +44,12 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         expect(panel.dashboard.flatParameters).toBe(true);
         expect(panel.promptGUIDHelper).toBeDefined();
         expect(panel.parametersChanged).toBeFalsy();
+        expect(panel.errorMessagePosition).toBe("top");
+        expect(panel.isEnableSubmitButton).toBe(true);
       });
 
       it("should create prompt panel in silent mode", function() {
-        var paramDefn = jasmine.createSpyObj("paramDefn", [ "allowAutoSubmit" ]);
+        var paramDefn = jasmine.createSpyObj("paramDefn", ["allowAutoSubmit"]);
         paramDefn.allowAutoSubmit.and.returnValue(true);
         var panel = new PromptPanel(testId, paramDefn, {isSilent: true});
         expect(panel.dashboard.isSilent).toBe(true);
@@ -59,7 +61,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
       var paramDefn;
       var dashboardSpy;
       beforeEach(function() {
-        paramDefn = jasmine.createSpyObj("paramDefn", [ "allowAutoSubmit", "showParameterUI" ]);
+        paramDefn = jasmine.createSpyObj("paramDefn", ["allowAutoSubmit", "showParameterUI"]);
         paramDefn.allowAutoSubmit.and.returnValue(true);
         paramDefn.showParameterUI.and.returnValue(false);
         paramDefn.promptNeeded = false;
@@ -68,7 +70,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         paramDefn.autoSubmit = false;
         paramDefn.page = 2;
 
-        dashboardSpy = jasmine.createSpyObj("dashboardSpy", [ "setParameter", "getParameterValue", "getComponentByName", "addComponent", "updateComponent", "showProgressIndicator", "hideProgressIndicator", "on"]);
+        dashboardSpy = jasmine.createSpyObj("dashboardSpy", ["setParameter", "getParameterValue", "getComponentByName", "addComponent", "updateComponent", "showProgressIndicator", "hideProgressIndicator", "on"]);
         panel = new PromptPanel(testId, paramDefn);
         panel.dashboard = dashboardSpy;
       });
@@ -80,7 +82,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
       it("getParameterName with parameter object", function() {
         var parameter = {
-          name : "test_name"
+          name: "test_name"
         };
         var name = panel.getParameterName(parameter);
         expect(name).toBe(panel.guid + parameter.name);
@@ -143,16 +145,16 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           spyOn(panel, "getParameterValue").and.returnValue(testVal);
           var params = panel.getParameterValues();
           expect(params).toEqual({
-            string_test_param : testVal,
-            number_test_param : testVal + 10
+            string_test_param: testVal,
+            number_test_param: testVal + 10
           });
           expect(panel.getParameterName).toHaveBeenCalled();
           expect(panel.getParameterValue).toHaveBeenCalled();
           expect(DojoNumber.parse).not.toHaveBeenCalledWith(testVal, {
-            locale : 'en'
+            locale: "en"
           });
-          expect(DojoNumber.parse).toHaveBeenCalledWith([ testVal ], {
-            locale : 'en'
+          expect(DojoNumber.parse).toHaveBeenCalledWith([testVal], {
+            locale: "en"
           });
         });
 
@@ -163,21 +165,21 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           });
           var params = panel.getParameterValues();
           expect(params).toEqual({
-            string_test_param : testVal,
-            number_test_param : [ testVal ]
+            string_test_param: testVal,
+            number_test_param: [testVal]
           });
           expect(panel.getParameterName).toHaveBeenCalled();
           expect(panel.getParameterValue).toHaveBeenCalled();
           expect(DojoNumber.parse).not.toHaveBeenCalledWith(testVal, {
-            locale : 'en'
+            locale: "en"
           });
-          expect(DojoNumber.parse).toHaveBeenCalledWith([ testVal ], {
-            locale : 'en'
+          expect(DojoNumber.parse).toHaveBeenCalledWith([testVal], {
+            locale: "en"
           });
         });
 
         it("should return params with localization", function() {
-          var testArr = [ 10, 20, 30 ];
+          var testArr = [10, 20, 30];
           var localization = jasmine.createSpy("localization");
           localization.decimal = 20;
           spyOn(panel, "getParameterValue").and.returnValue(testArr);
@@ -186,18 +188,18 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           });
           var params = panel.getParameterValues();
           expect(params).toEqual({
-            string_test_param : testArr,
-            number_test_param : testArr
+            string_test_param: testArr,
+            number_test_param: testArr
           });
           expect(panel.getParameterName).toHaveBeenCalled();
           expect(panel.getParameterValue).toHaveBeenCalled();
           expect(DojoNumber.parse).toHaveBeenCalledWith(testArr, {
-            locale : 'en'
+            locale: "en"
           });
         });
 
         it("should return params with default localization", function() {
-          var testArr = [ 10, 20, 30, 50 ];
+          var testArr = [10, 20, 30, 50];
           var localization = jasmine.createSpy("localization");
           localization.decimal = 20;
           var defaultLocalization = jasmine.createSpy("defaultLocalization");
@@ -213,13 +215,13 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
           var params = panel.getParameterValues();
           expect(params).toEqual({
-            string_test_param : testArr,
-            number_test_param : "20"
+            string_test_param: testArr,
+            number_test_param: "20"
           });
           expect(panel.getParameterName).toHaveBeenCalled();
           expect(panel.getParameterValue).toHaveBeenCalled();
           expect(DojoNumber.parse).toHaveBeenCalledWith(testArr, {
-            locale : 'en'
+            locale: "en"
           });
         });
       });
@@ -235,7 +237,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         var param;
         beforeEach(function() {
           spyOn(panel, "setParameterValue");
-          param = jasmine.createSpyObj("param", [ "getSelectedValuesValue" ]);
+          param = jasmine.createSpyObj("param", ["getSelectedValuesValue"]);
         });
         it("should set empty string for empty array values", function() {
           param.getSelectedValuesValue.and.returnValue([]);
@@ -244,7 +246,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
 
         it("should set value from array", function() {
-          param.getSelectedValuesValue.and.returnValue([ testValue ]);
+          param.getSelectedValuesValue.and.returnValue([testValue]);
           panel._initializeParameterValue(paramDefn, param);
           expect(panel.setParameterValue).toHaveBeenCalledWith(param, testValue);
         });
@@ -343,7 +345,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
         var parameterChangedSpy = jasmine.createSpy("ParameterChangedSpy");
         panel.onParameterChanged = {};
-        panel.onParameterChanged['name'] = parameterChangedSpy;
+        panel.onParameterChanged["name"] = parameterChangedSpy;
 
         panel.parameterChanged(param, name, value);
         expect(panel.parametersChanged).toBeTruthy();
@@ -360,8 +362,8 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         var parameterChangedSpySpecific = jasmine.createSpy("parameterChangedSpySpecific");
         var parameterChangedSpyGeneric = jasmine.createSpy("parameterChangedSpyGeneric");
         panel.onParameterChanged = {};
-        panel.onParameterChanged['name'] = parameterChangedSpySpecific;
-        panel.onParameterChanged[''] = parameterChangedSpyGeneric;
+        panel.onParameterChanged["name"] = parameterChangedSpySpecific;
+        panel.onParameterChanged[""] = parameterChangedSpyGeneric;
 
         panel.parameterChanged(param, name, value);
         expect(panel.parametersChanged).toBeTruthy();
@@ -379,10 +381,10 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         var parameterChangedSpySpecific = jasmine.createSpy("parameterChangedSpySpecific");
         var parameterChangedSpyGeneric = jasmine.createSpy("parameterChangedSpyGeneric");
         panel.onParameterChanged = {};
-        panel.onParameterChanged['name'] = parameterChangedSpySpecific;
-        panel.onParameterChanged[''] = parameterChangedSpyGeneric;
+        panel.onParameterChanged["name"] = parameterChangedSpySpecific;
+        panel.onParameterChanged[""] = parameterChangedSpyGeneric;
 
-        panel.parameterChanged(param, 'name2', value);
+        panel.parameterChanged(param, "name2", value);
         expect(panel.parametersChanged).toBeTruthy();
         expect(panel._setTimeoutRefreshPrompt).toHaveBeenCalled();
         expect(parameterChangedSpySpecific).not.toHaveBeenCalled();
@@ -513,7 +515,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
       it("getParameterDefinition", function() {
         var promptPanel = {};
-        var fn = jasmine.createSpyObj("callbackObj", [ "test" ]);
+        var fn = jasmine.createSpyObj("callbackObj", ["test"]);
         panel.getParameterDefinition(promptPanel, fn.test);
         expect(fn.test).toHaveBeenCalled();
       });
@@ -536,7 +538,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           });
           panel.refreshPrompt();
           expect(panel.getParameterDefinition).toHaveBeenCalled();
-          expect(window.alert).toHaveBeenCalledWith('Exception caught attempting to execute refreshCallback');
+          expect(window.alert).toHaveBeenCalledWith("Exception caught attempting to execute refreshCallback");
         });
       });
 
@@ -551,7 +553,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
         it("should not refresh if exists waitingForInit parameter", function() {
           var dash = jasmine.createSpy("dashSpy");
-          dash.waitingForInit = [ 1, 2 ];
+          dash.waitingForInit = [1, 2];
           panel.dashboard = dash;
 
           panel.refresh();
@@ -577,9 +579,9 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
 
         it("should init also with components", function() {
-          var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI", "allowAutoSubmit" ]);
+          var paramDefn = jasmine.createSpyObj("paramDefnSpy", ["showParameterUI", "allowAutoSubmit"]);
           var comp = jasmine.createSpy("compSpy");
-          var components = [ comp ];
+          var components = [comp];
           panel.components = components;
           panel.refresh(paramDefn);
           expect(panel.paramDefn).toBe(paramDefn);
@@ -588,18 +590,18 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
 
         it("should init also with components and find focused param", function() {
-          var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI", "allowAutoSubmit", "getParameter" ]);
+          var paramDefn = jasmine.createSpyObj("paramDefnSpy", ["showParameterUI", "allowAutoSubmit", "getParameter"]);
           var param = {
-            name : "test_param_name"
+            name: "test_param_name"
           };
           paramDefn.getParameter.and.returnValue(param);
-          var comp = jasmine.createSpyObj("compSpy", [ "placeholder", "topValue" ]);
+          var comp = jasmine.createSpyObj("compSpy", ["placeholder", "topValue"]);
           comp.topValue.and.returnValue(100);
           comp.param = param;
           comp.promptType = "prompt";
           comp.type = "SelectMultiComponent";
-          spyOn($.fn, "init").and.returnValue([ {} ]);
-          var components = [ comp ];
+          spyOn($.fn, "init").and.returnValue([{}]);
+          var components = [comp];
           panel.dashboard.components = components;
           panel.refresh(paramDefn);
           expect(panel.paramDefn).toBe(paramDefn);
@@ -610,26 +612,26 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
 
         it("should init also with components for ScrollingPromptPanelLayoutComponent", function() {
-          var paramDefn = jasmine.createSpyObj("paramDefnSpy", [ "showParameterUI", "allowAutoSubmit" ]);
-          var comp = jasmine.createSpyObj("compSpy", [ "placeholder", "topValue" ]);
+          var paramDefn = jasmine.createSpyObj("paramDefnSpy", ["showParameterUI", "allowAutoSubmit"]);
+          var comp = jasmine.createSpyObj("compSpy", ["placeholder", "topValue"]);
           comp.name = "compTestName";
           comp.placeholder.and.returnValue();
           comp.placeholder.and.returnValue({
-            children : function() {
+            children: function() {
               return {
-                scrollTop : function() {
+                scrollTop: function() {
                   return 100;
                 },
-                children : comp.placeholder
+                children: comp.placeholder
               };
             },
-            scrollLeft : function() {
+            scrollLeft: function() {
               return 50;
             }
           });
           comp.type = "ScrollingPromptPanelLayoutComponent";
           spyOn(window, "$");
-          var components = [ comp ];
+          var components = [comp];
           panel.dashboard.components = components;
           panel.refresh(paramDefn);
           expect(panel.paramDefn).toBe(paramDefn);
@@ -637,9 +639,9 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(panel._focusedParam).not.toBeDefined();
           expect(window.$).not.toHaveBeenCalled();
           expect(panel._multiListBoxTopValuesByParam).toEqual({
-            "_compTestName" : {
-              "scrollTopValue" : 100,
-              "scrollLeftValue" : 50
+            "_compTestName": {
+              "scrollTopValue": 100,
+              "scrollLeftValue": 50
             }
           });
         });
@@ -650,28 +652,28 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         var paramDefn;
         var childElem;
         beforeEach(function() {
-          paramDefn = jasmine.createSpyObj("paramDefn", [ "mapParameters", "showParameterUI", "allowAutoSubmit" ]);
+          paramDefn = jasmine.createSpyObj("paramDefn", ["mapParameters", "showParameterUI", "allowAutoSubmit"]);
           paramDefn.showParameterUI.and.returnValue(false);
-          dash = jasmine.createSpyObj("dashSpy", [ "addComponents", "init", "getComponentByName", "updateComponent", "postInit" ]);
+          dash = jasmine.createSpyObj("dashSpy", ["addComponents", "init", "getComponentByName", "updateComponent", "postInit"]);
           var submitComponent = {
-            promptType : "submit",
-            name : "submitCompName"
+            promptType: "submit",
+            name: "submitCompName"
           };
           var promptComponent = {
-            promptType : "prompt",
-            param : {
-              name : "test"
+            promptType: "prompt",
+            param: {
+              name: "test"
             },
-            type : "SelectMultiComponent",
-            name : "promptCompName"
+            type: "SelectMultiComponent",
+            name: "promptCompName"
           };
           var scrollComponent = {
-            type : "ScrollingPromptPanelLayoutComponent",
-            name : "testName"
+            type: "ScrollingPromptPanelLayoutComponent",
+            name: "testName"
           };
           var prompt = {
-            components : [ submitComponent, promptComponent, scrollComponent ]
-          }
+            components: [submitComponent, promptComponent, scrollComponent]
+          };
           dash.getComponentByName.and.returnValue(prompt);
           spyOn(panel, "_initializeParameterValue");
           spyOn(panel, "submit");
@@ -680,10 +682,10 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           spyOn(panel, "buildPanelComponents");
           spyOn(panel, "update");
           panel._multiListBoxTopValuesByParam = {
-            "_test" : 100,
-            "_testName" : {
-              scrollTopValue : 100,
-              scrollLeftValue : 50
+            "_test": 100,
+            "_testName": {
+              scrollTopValue: 100,
+              scrollLeftValue: 50
             }
           };
           panel._focusedParam = promptComponent.param.name;
@@ -717,7 +719,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(dash.init).not.toHaveBeenCalled();
           expect(panel._initializeParameterValue).not.toHaveBeenCalled();
           expect(panel.submit).toHaveBeenCalledWith(panel, {
-            isInit : true
+            isInit: true
           });
         });
 
@@ -736,7 +738,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(dash.init).toHaveBeenCalled();
           expect(panel._initializeParameterValue).not.toHaveBeenCalled();
           expect(panel.submit).toHaveBeenCalledWith(panel, {
-            isInit : true
+            isInit: true
           });
           expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
         });
@@ -784,11 +786,11 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
       });
 
       it("hide", function() {
-        var spyElem = jasmine.createSpyObj("spyElem", [ "css" ]);
+        var spyElem = jasmine.createSpyObj("spyElem", ["css"]);
         spyOn($.fn, "init").and.returnValue(spyElem);
         panel.hide();
         expect($.fn.init).toHaveBeenCalledWith("#" + panel.destinationId, undefined);
-        expect(spyElem.css).toHaveBeenCalledWith('display', 'none');
+        expect(spyElem.css).toHaveBeenCalledWith("display", "none");
       });
 
       describe("_buildPanelForParameter", function() {
@@ -813,16 +815,16 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
         it("should create panel widget", function() {
           var param = {};
-          param.values = [ "val1", "val2" ];
+          param.values = ["val1", "val2"];
           param.name = "test_name";
           param.attributes = {
-            label : "test label"
+            label: "test label"
           };
-          panel.paramDefn.errors[param.name] = [ "Error 1" ];
+          panel.paramDefn.errors[param.name] = ["Error 1"];
           var paramPanel = panel._buildPanelForParameter(param);
           expect(paramPanel).toBeDefined();
           expect(panel._initializeParameterValue).toHaveBeenCalledWith(panel.paramDefn, param);
-          expect(paramPanel.cssClass).toBe(' error');
+          expect(paramPanel.cssClass).toBe(" error");
           expect(paramPanel.components.length).toBe(3);
           expect(paramPanel.components[0].type).toBe("TextComponent");
           expect(paramPanel.components[1].type).toBe("TextComponent");
@@ -847,7 +849,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
         it("should return empty array for empty groups", function() {
           var paramDefn = {
-            parameterGroups : []
+            parameterGroups: []
           };
           panel.paramDefn = paramDefn;
           var components = panel.buildPanelComponents();
@@ -857,10 +859,10 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
         it("should return empty array for empty parameters", function() {
           var group = {
-            parameters : []
+            parameters: []
           };
           var paramDefn = {
-            parameterGroups : [ group ]
+            parameterGroups: [group]
           };
           panel.paramDefn = paramDefn;
           var components = panel.buildPanelComponents();
@@ -872,22 +874,22 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           var compSpy = jasmine.createSpy("compSpy");
           spyOn(panel, "_buildPanelForParameter").and.returnValue(compSpy);
           var hiddenParam = {
-            name : "hidden_param",
-            attributes : {
-              hidden : 'true'
+            name: "hidden_param",
+            attributes: {
+              hidden: "true"
             }
           };
           var visibleParam = {
-            name : "param_0",
-            attributes : {
-              hidden : 'false'
+            name: "param_0",
+            attributes: {
+              hidden: "false"
             }
           };
           var group = {
-            parameters : [ hiddenParam, visibleParam ]
+            parameters: [hiddenParam, visibleParam]
           };
           var paramDefn = {
-            parameterGroups : [ group ]
+            parameterGroups: [group]
           };
           panel.paramDefn = paramDefn;
           var components = panel.buildPanelComponents();
@@ -905,31 +907,31 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         var comp;
         beforeEach(function() {
           var listener = {
-            name : "test_name"
+            name: "test_name"
           };
-          comp = jasmine.createSpyObj("compSpy", [ "clear" ]);
+          comp = jasmine.createSpyObj("compSpy", ["clear"]);
           comp.name = "0";
           comp.parameter = listener;
-          var components = [ comp ];
-          dash = jasmine.createSpyObj("dashboard", [ "removeComponent" ]);
+          var components = [comp];
+          dash = jasmine.createSpyObj("dashboard", ["removeComponent"]);
           dash.removeComponent.and.callFake(function(name) {
             return components[parseInt(name)];
           });
-          var paramComp = jasmine.createSpyObj("compSpy", [ "clear" ]);
-          paramComp.listeners = [ listener ];
-          dash.components = [ paramComp ];
+          var paramComp = jasmine.createSpyObj("compSpy", ["clear"]);
+          paramComp.listeners = [listener];
+          dash.components = [paramComp];
           panel.dashboard = dash;
         });
 
         it("should remove components without postpone clear", function() {
-          panel.removeDashboardComponents([ comp ]);
+          panel.removeDashboardComponents([comp]);
           expect(dash.removeComponent).toHaveBeenCalledWith(comp.name);
           expect(comp.clear).toHaveBeenCalled();
           expect(panel.dashboard.components[0].listeners.length).toBe(0);
         });
 
         it("should remove components with postpone clear", function() {
-          panel.removeDashboardComponents([ comp ], true);
+          panel.removeDashboardComponents([comp], true);
           expect(dash.removeComponent).toHaveBeenCalledWith(comp.name);
           expect(comp.clear).not.toHaveBeenCalled();
           expect(panel.dashboard.components[0].listeners.length).toBe(0);
@@ -982,39 +984,39 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           beforeEach(function() {
             paramSpy = jasmine.createSpyObj("paramSpy", ["getSelectedValuesValue"]);
 
-            componentSpy = jasmine.createSpyObj("componentSpy", [ "clear", "removeErrorClass" ]);
+            componentSpy = jasmine.createSpyObj("componentSpy", ["clear", "removeErrorClass"]);
             componentSpy.parameter = paramName;
             componentSpy.type = "TestPanel";
 
             panel.dashboard.components = [componentSpy];
             panel.guid = guid;
 
-            groupPanelSpy = jasmine.createSpyObj("groupPanelSpy", [ "clear" ]);
+            groupPanelSpy = jasmine.createSpyObj("groupPanelSpy", ["clear"]);
             groupPanelSpy.components = [componentSpy];
             spyOn(groupPanelSpy.components, "indexOf").and.callThrough();
             spyOn(groupPanelSpy.components, "splice").and.callThrough();
 
-            promptPanelSpy = jasmine.createSpyObj("promptPanelSpy", [ "clear" ]);
+            promptPanelSpy = jasmine.createSpyObj("promptPanelSpy", ["clear"]);
             promptPanelSpy.components = [];
 
             spyOn(panel, "getParameterName").and.returnValue(paramName);
             panel.dashboard.getComponentByName.and.callFake(function(name) {
-              if (name == groupParamName) {
+              if(name == groupParamName) {
                 return groupPanelSpy;
-              } else if (name == "prompt" + guid) {
+              } else if(name == "prompt" + guid) {
                 return promptPanelSpy;
               }
             });
 
-            submitComponentSpy = jasmine.createSpyObj("submitComponentSpy", [ "clear" ]);
+            submitComponentSpy = jasmine.createSpyObj("submitComponentSpy", ["clear"]);
             submitComponentSpy.promptType = "submit";
             submitComponentSpy.type = "FlowPromptLayoutComponent";
           });
 
           describe("_removeComponentsByDiff", function() {
-            it ("should successfully remove the provided components", function() {
+            it("should successfully remove the provided components", function() {
               diffSpy.toRemove[groupParamName] = {
-                params : [paramSpy]
+                params: [paramSpy]
               };
 
               promptPanelSpy.components = [submitComponentSpy];
@@ -1026,7 +1028,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
               expect(panel.getParameterName).toHaveBeenCalledWith(paramSpy);
               expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith(groupParamName);
-              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt"+guid);
+              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt" + guid);
               expect(groupPanelSpy.components.indexOf).toHaveBeenCalledWith(componentSpy);
               expect(groupPanelSpy.components.splice).toHaveBeenCalledWith(0, 1);
               expect(promptPanelSpy.components.splice).toHaveBeenCalledWith(0, 1);
@@ -1038,7 +1040,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
             var panelSpy;
             beforeEach(function() {
               diffSpy.toAdd[groupParamName] = {
-                params : [paramSpy]
+                params: [paramSpy]
               };
 
               panelSpy = jasmine.createSpy("panelSpy");
@@ -1052,7 +1054,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               promptPanelSpy.components = [submitComponentSpy];
 
               panel.dashboard.getComponentByName.and.callFake(function(name) {
-                if (name == "prompt" + guid) {
+                if(name == "prompt" + guid) {
                   return promptPanelSpy;
                 }
               });
@@ -1066,7 +1068,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(panel.dashboard.updateComponent).toHaveBeenCalled();
               expect(panel.dashboard.updateComponent.calls.count()).toBe(3);
               expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith(groupParamName);
-              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt"+guid);
+              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt" + guid);
               expect(panel._buildPanelForParameter).toHaveBeenCalledWith(paramSpy);
               expect(panel.widgetBuilder.build).toHaveBeenCalled();
             });
@@ -1084,7 +1086,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(panel.dashboard.updateComponent).toHaveBeenCalled();
               expect(panel.dashboard.updateComponent.calls.count()).toBe(3);
               expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith(groupParamName);
-              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt"+guid);
+              expect(panel.dashboard.getComponentByName).toHaveBeenCalledWith("prompt" + guid);
               expect(panel._buildPanelForParameter).toHaveBeenCalledWith(paramSpy);
               expect(panel.widgetBuilder.build).toHaveBeenCalled();
               expect(groupPanelSpy.components.indexOf(panelSpy)).toBe(0);
@@ -1103,11 +1105,11 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
           describe("_changeComponentsByDiff", function() {
             var originalParam, change, componentSpy,
-                guid = "guid", groupName = "test_group",
-                changedParam, value1, value2;
+              guid = "guid", groupName = "test_group",
+              changedParam, value1, value2;
 
             beforeEach(function() {
-              // set up some parameter values
+                // set up some parameter values
               value1 = new ParameterValue();
               value1.value = "jitsu";
               value1.label = "jitsu";
@@ -1120,13 +1122,13 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               value2.type = "java.lang.String";
 
               var paramDefn;
-              // create a parameter
+                // create a parameter
               originalParam = new Parameter();
               originalParam.type = "java.lang.String";
               originalParam.list = true;
               originalParam.name = paramName;
               originalParam.multiSelect = true;
-              originalParam.values = [ value1, value2 ];
+              originalParam.values = [value1, value2];
 
               paramDefn = new ParameterDefinition();
               var group = new ParameterGroup();
@@ -1173,18 +1175,18 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               spyOn(panel, "_initializeParameterValue");
               panel.dashboard.getParameterValue.and.returnValue("do");
 
-              var valuesArrayWithDefaults = [ ["test1", "test1"], ["test2", "test2"] ];
+              var valuesArrayWithDefaults = [["test1", "test1"], ["test2", "test2"]];
               componentSpy.valuesArray = valuesArrayWithDefaults;
 
-              var valuesArray = [ ["test1", "test1"], ["test2", "test2"] ];
+              var valuesArray = [["test1", "test1"], ["test2", "test2"]];
               spyOn(panel.widgetBuilder, "build").and.callFake(function(obj, type) {
-                return { "valuesArray": valuesArray };
+                return {"valuesArray": valuesArray};
               });
 
               changedParam = new Parameter();
               changedParam.type = "java.lang.String";
               changedParam.name = paramName;
-              changedParam.values = [ value1, value2 ];
+              changedParam.values = [value1, value2];
               change = {};
               change[groupName] = {
                 params: [changedParam]
@@ -1213,9 +1215,9 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               spyOn(panelSpy.components, "splice").and.callThrough();
 
               panel.dashboard.getComponentByName.and.callFake(function(name) {
-                if (name == groupName) {
+                if(name == groupName) {
                   return groupPanelSpy;
-                } else if (name == "prompt" + guid) {
+                } else if(name == "prompt" + guid) {
                   return panelSpy;
                 }
               });
@@ -1223,10 +1225,10 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               changedParam = new Parameter();
               changedParam.type = "java.lang.String";
               changedParam.name = paramName;
-              changedParam.values = [ value1, value2 ];
-              var valuesArray = [["jitsu", "dō", "-- no selection --"],["jitsu", "do", "_none_"]];
+              changedParam.values = [value1, value2];
+              var valuesArray = [["jitsu", "dō", "-- no selection --"], ["jitsu", "do", "_none_"]];
               spyOn(panel.widgetBuilder, "build").and.callFake(function(obj, type) {
-                return { "valuesArray": valuesArray };
+                return {"valuesArray": valuesArray};
               });
 
               change = {};
@@ -1243,7 +1245,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(panel.widgetBuilder.build).toHaveBeenCalled();
               expect(panel.forceSubmit).toBe(true);
 
-              spyOn(changedParam, "getSelectedValuesValue").and.callFake(function(){
+              spyOn(changedParam, "getSelectedValuesValue").and.callFake(function() {
                 return ["a"];
               });
               panel.dashboard.getParameterValue.and.returnValue("a");
@@ -1262,19 +1264,17 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
               expect(panel.dashboard.updateComponent).toHaveBeenCalledWith(componentSpy);
             });
 
-
             describe("PromptPanel's update components behaviour in _changeComponentsByDiff()", function() {
 
               beforeEach(function() {
                 spyOn(panel, "_initializeParameterValue");
 
-                var valuesArray = [ ['qwerty', 'qwerty'] ];
+                var valuesArray = [["qwerty", "qwerty"]];
                 componentSpy.valuesArray = valuesArray;
                 spyOn(panel.widgetBuilder, "build").and.callFake(function(obj, type) {
-                  return { "valuesArray": valuesArray };
+                  return {"valuesArray": valuesArray};
                 });
               });
-
 
               var doTest = function(currentValue, selectedValue, type, updateIsExpected) {
                 panel.dashboard.updateComponent.calls.reset();
@@ -1283,53 +1283,53 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
                 var selectedParams = [];
                 selectedValue = ((type.indexOf("[") === 0 || _.isArray(selectedValue)) && selectedValue) ? selectedValue : [selectedValue];
 
-                for(var i=0; i < selectedValue.length; i++) {
+                for(var i = 0; i < selectedValue.length; i++) {
                   selectedParams[i] = new ParameterValue();
                   selectedParams[i].value = selectedValue[i];
                   selectedParams[i].selected = true;
                 }
 
                 var param = new Parameter();
-                param.name = 'param';
+                param.name = "param";
                 param.type = type;
                 param.values = selectedParams;
 
-                var toChangeDiff = { groupName: { params: [param] } };
+                var toChangeDiff = {groupName: {params: [param]}};
                 panel._changeComponentsByDiff(toChangeDiff);
 
-                // should never be called in this test set
+                  // should never be called in this test set
                 expect(panel._initializeParameterValue).not.toHaveBeenCalled();
-                if (updateIsExpected) {
+                if(updateIsExpected) {
                   expect(panel.dashboard.updateComponent).toHaveBeenCalled();
                 } else {
                   expect(panel.dashboard.updateComponent).not.toHaveBeenCalled();
                 }
               };
 
-              it("cases for string", function () {
-                var stringType = 'java.lang.String';
+              it("cases for string", function() {
+                var stringType = "java.lang.String";
 
-                doTest('a', 'a', stringType, false);
-                doTest('a', 'A', stringType, false);
-                doTest('A', 'a', stringType, false);
+                doTest("a", "a", stringType, false);
+                doTest("a", "A", stringType, false);
+                doTest("A", "a", stringType, false);
 
-                doTest('a', 'a ', stringType, true);
-                doTest('a', '1', stringType, true);
-                doTest('a', [], stringType, true);
-                doTest('', [], stringType, true);
+                doTest("a", "a ", stringType, true);
+                doTest("a", "1", stringType, true);
+                doTest("a", [], stringType, true);
+                doTest("", [], stringType, true);
 
                 doTest(null, null, stringType, false);
                 doTest(undefined, null, stringType, false);
                 doTest(null, undefined, stringType, false);
                 doTest(undefined, undefined, stringType, false);
 
-                doTest(["a","b"], ["a","b"], stringType, false);
-                doTest(["a","b"], ["a"], stringType, true);
-                doTest(["b"], ["c","b","a"], stringType, true);
+                doTest(["a", "b"], ["a", "b"], stringType, false);
+                doTest(["a", "b"], ["a"], stringType, true);
+                doTest(["b"], ["c", "b", "a"], stringType, true);
               });
 
-              it("cases for date", function () {
-                var dateType = 'java.sql.Date';
+              it("cases for date", function() {
+                var dateType = "java.sql.Date";
 
                 doTest(new Date(2000, 0, 1), new Date(2000, 0, 1), dateType, false);
                 doTest(new Date(2000, 0, 1, 0, 1), new Date(2000, 0, 1, 2, 3), dateType, false);
@@ -1343,16 +1343,16 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
                 doTest(undefined, undefined, dateType, false);
               });
 
-              it("cases for arrays", function () {
-                var arrayType = '[arrayType'; // Starting with "[" means its an array
+              it("cases for arrays", function() {
+                var arrayType = "[arrayType"; // Starting with "[" means its an array
 
-                doTest(["a","b"], ["a","b"], arrayType, false);
-                doTest(["a","b"], ["b","a"], arrayType, false);
-                doTest(["b","a","c"], ["c","b","a"], arrayType, false);
+                doTest(["a", "b"], ["a", "b"], arrayType, false);
+                doTest(["a", "b"], ["b", "a"], arrayType, false);
+                doTest(["b", "a", "c"], ["c", "b", "a"], arrayType, false);
 
-                doTest(["a","b"], ["a"], arrayType, true);
-                doTest(["a","b"], ["a","c"], arrayType, true);
-                doTest(["a"], ["b","c"], arrayType, true);
+                doTest(["a", "b"], ["a"], arrayType, true);
+                doTest(["a", "b"], ["a", "c"], arrayType, true);
+                doTest(["a"], ["b", "c"], arrayType, true);
 
                 doTest(null, null, arrayType, false);
                 doTest(undefined, null, arrayType, false);
@@ -1360,13 +1360,13 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
                 doTest(undefined, undefined, arrayType, false);
               });
 
-              it("cases for other types", function () {
-                var someType  = 'some-type';
+              it("cases for other types", function() {
+                var someType = "some-type";
 
                 doTest(0, 0, someType, false);
-                doTest(0, '0', someType, false);
+                doTest(0, "0", someType, false);
 
-                doTest('null', null, someType, true);
+                doTest("null", null, someType, true);
               });
 
             });
@@ -1401,9 +1401,9 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
             it("should process existing errors", function() {
               panel.paramDefn = {
-                errors : {}
+                errors: {}
               };
-              panel.paramDefn.errors[paramSpy.name] = [ "error_0", "error_1" ];
+              panel.paramDefn.errors[paramSpy.name] = ["error_0", "error_1"];
 
               var existErrorComponent = jasmine.createSpy("existErrorComponent");
               existErrorComponent.promptType = "label";
@@ -1432,7 +1432,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
 
             it("should process without errors", function() {
               panel.paramDefn = {
-                errors : {}
+                errors: {}
               };
 
               paramSpy.isErrorChanged = true;
@@ -1510,7 +1510,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
         });
 
         it("should throw exception if try set not allowed autoSubmit flag", function() {
-          var paramDefnSpy = jasmine.createSpyObj("paramDefnSpy", [ "allowAutoSubmit" ]);
+          var paramDefnSpy = jasmine.createSpyObj("paramDefnSpy", ["allowAutoSubmit"]);
           spyOn(panel, "getParamDefn").and.returnValue(paramDefnSpy);
           expect(function() {
             var state = {
@@ -1574,7 +1574,7 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
           expect(panel.onStateChanged).toHaveBeenCalledWith("promptNeeded", undefined, paramDefn.promptNeeded);
           expect(panel.onStateChanged).toHaveBeenCalledWith("paginate", undefined, paramDefn.paginate);
           expect(panel.onStateChanged).toHaveBeenCalledWith("totalPages", undefined, paramDefn.totalPages);
-          expect(panel.onStateChanged).toHaveBeenCalledWith("showParameterUI", undefined,paramDefn.showParameterUI());
+          expect(panel.onStateChanged).toHaveBeenCalledWith("showParameterUI", undefined, paramDefn.showParameterUI());
           expect(panel.onStateChanged).toHaveBeenCalledWith("allowAutoSubmit", undefined, paramDefn.allowAutoSubmit());
           expect(panel.onStateChanged).toHaveBeenCalledWith("page", undefined, paramDefn.page);
         });
@@ -1601,15 +1601,69 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
       });
 
       describe("onPostInit", function() {
-        it ("should register a postIinit function to the dashboard", function() {
+        it("should register a postIinit function to the dashboard", function() {
           var callbackSpy = jasmine.createSpy("functionSpy");
           spyOn(panel, "getDashboard").and.callThrough();
 
           panel.onPostInit(callbackSpy);
 
-
           expect(panel.getDashboard).toHaveBeenCalled();
-          expect(panel.dashboard.on).toHaveBeenCalledWith('cdf:postInit', callbackSpy);
+          expect(panel.dashboard.on).toHaveBeenCalledWith("cdf:postInit", callbackSpy);
+        });
+      });
+
+      describe("setErrorMessagePosition", function() {
+        it("should set 'top' position", function() {
+          panel.setErrorMessagePosition("top");
+          expect(panel.errorMessagePosition).toBe("top");
+        });
+
+        it("should set 'bottom' position", function() {
+          panel.setErrorMessagePosition("bottom");
+          expect(panel.errorMessagePosition).toBe("bottom");
+        });
+
+        it("should set 'top' position by default", function() {
+          panel.setErrorMessagePosition();
+          expect(panel.errorMessagePosition).toBe("top");
+        });
+      });
+
+      describe("setDisabledSubmitButton", function() {
+        var setDisabledButtonSpy;
+        beforeEach(function() {
+          setDisabledButtonSpy = jasmine.createSpy("setDisabledButton");
+          var comp1 = {
+            promptType: "test",
+            type: "label"
+          };
+          var comp2 = {
+            promptType: "submit",
+            type: "label"
+          };
+          var comp3 = {
+            promptType: "submit",
+            type: "SubmitPromptComponent",
+            setDisabledButton: setDisabledButtonSpy
+          };
+          var dashboard = {
+            components: [comp1, comp2, comp3]
+          };
+          spyOn(panel, "getDashboard").and.returnValue(dashboard);
+        });
+
+        it("should change disabled flag", function() {
+          panel.isEnableSubmitButton = true;
+          panel.setDisabledSubmitButton(true);
+          expect(panel.isEnableSubmitButton).toBe(false);
+          expect(setDisabledButtonSpy).toHaveBeenCalledWith(true);
+        });
+
+        it("should not change disabled flag", function() {
+          panel.isEnableSubmitButton = true;
+          panel.setDisabledSubmitButton(false);
+          expect(panel.isEnableSubmitButton).toBe(true);
+          expect(setDisabledButtonSpy).not.toHaveBeenCalled();
         });
       });
     });
