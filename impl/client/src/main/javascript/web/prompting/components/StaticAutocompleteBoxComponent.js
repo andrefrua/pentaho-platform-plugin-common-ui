@@ -73,6 +73,9 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
      * is not up-to-date when the input box is empty, because the source callback is not called in this scenario
      */
     prevSelValue: undefined,
+
+    latestRequestTimestamp: 0,
+
     /**
      * Creates a static autocomplete box element.
      */
@@ -166,16 +169,19 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
             input[0].setSelectionRange(inputTextLength, inputTextLength);
           }
         }.bind(this),
-        source: function(request, response) {
+        source: _.debounce(function(request, response) {
+          var currentTimestamp = Date.now();
+          this.latestRequestTimestamp = currentTimestamp;
+
           if (this.prevSelValue !== request.term) {
             this.prevSelValue = request.term;
             this._searchResponseCallback = response;
             this.needsUpdateOnNextRefresh = true;
             this.dashboard.processChange(this.name);
           } else {
-            this._finalizeSource(request.term, response);
+            this._finalizeSource(request.term, response, currentTimestamp);
           }
-        }.bind(this),
+        }.bind(this), 300),
 
         // change() is called on blur
         //change: function(event, ui) {
@@ -227,7 +233,11 @@ define([ 'common-ui/util/util', 'cdf/components/BaseComponent',  'amd!cdf/lib/jq
       return $("<a></a>").html(source);
     },
 
-    _finalizeSource: function(term, responseCallback) {
+    _finalizeSource: function(term, responseCallback, requestTimestamp) {
+      if (requestTimestamp < this.latestRequestTimestamp) {
+        return;
+      }
+
       var searchTerm = term.toUpperCase();
       var matches = $.map(this.valuesArray, function(tag) {
         // we need unescape label before matching (fix for special characters like as &#39; &amp; &lt; &gt)
